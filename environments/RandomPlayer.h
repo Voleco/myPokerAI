@@ -35,7 +35,10 @@ void RandomPlayer::InformLegalActions(GameEngine& eng)
 	eng.GetLegalActions(playerID, acts);
 }
 
-//void RandomPlayer::Ta
+void RandomPlayer::TakeAction(GameEngine& eng, Action a)
+{
+	
+}
 
 
 

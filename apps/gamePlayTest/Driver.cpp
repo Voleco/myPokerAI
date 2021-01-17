@@ -9,6 +9,9 @@
 #include"../../environments/Player.h"
 #include"../../environments/RandomPlayer.h"
 
+
+using std::cout;
+
 int main(int argc,char** argv)
 {
 	/*

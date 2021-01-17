@@ -38,6 +38,8 @@ default : all
 
 SRC_CPP = \
 	environments/Table.cpp \
-	environments/GameEngine.cpp
+	environments/GameEngine.cpp \
+	environments/Card.cpp \
+	environments/Deck.cpp
 
 
