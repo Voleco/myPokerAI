@@ -20,7 +20,13 @@ void GameEngine::ClearTable()
 {
 	playerPtrs.resize(0);
 	for (unsigned int i = 0; i < tableCapacity; i++)
+	{
 		playerPtrs.push_back(NULL);
+		seatActive.push_back(false);
+		activePlayersInPot.push_back(false);
+	}
+
+
 }
 
 bool GameEngine::AddPlayerToPos(Player<GameEngine,Action>* p, unsigned int pos)
@@ -30,11 +36,19 @@ bool GameEngine::AddPlayerToPos(Player<GameEngine,Action>* p, unsigned int pos)
 	if (playerPtrs[pos] != NULL)
 		return false;
 	playerPtrs[pos] = p;
+	if (p->GetChipsCount()>0)
+		seatActive[pos] = true;
 	return true;
 }
 
 void GameEngine::InitializeOneGame()
 {
+	deck->ShuffleCards();
+
+	std::cout<<"the shuffled deck"<<"\n";
+	std::cout<<*deck<<"\n";
+	for (unsigned int i=0;i<tableCapacity;i++)
+		activePlayersInPot[i] = seatActive[i];
 	int pot = 0;
 	//collect ante and put them into pot
 	/*
@@ -47,13 +61,34 @@ void GameEngine::InitializeOneGame()
 		}
 	}
 	*/
-	for (unsigned int i = 0; i < activeSeats.size(); i++)
+	for (unsigned int i = 0; i < tableCapacity; i++)
 	{
-		playerPtrs[activeSeats[i]]->AddChips(-ante);
-		pot += ante;
+		if(activePlayersInPot[i])
+		{
+			playerPtrs[i]->AddChips(-ante);
+			pot += ante;
+		}	
 	}
 	
 
+}
+
+void GameEngine::DealPlayerCard(unsigned int seatPos)
+{
+	playerPtrs[seatPos]->GetPrivateCard(deck->DealOneCard());
+}
+
+void GameEngine::DealPlayerCards()
+{
+	//give each player 2 cards
+	for (int j=0;j<2;j++)
+	{
+		for (unsigned int i = 0; i < tableCapacity; i++)
+		{
+			if(activePlayersInPot[i])
+				playerPtrs[i]->GetPrivateCard(deck->DealOneCard());
+		}
+	}
 }
 
 void GameEngine::GetLegalActions(unsigned int playerID, vector<Action>& acts)

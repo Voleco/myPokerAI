@@ -18,8 +18,10 @@ using std::vector;
 class GameEngine
 {
 public:
-	GameEngine() {}
+	GameEngine() { ClearTable(); InitializedDeck(52);}
+	~GameEngine() {delete deck;}
 	void SetTableSize(unsigned int size) { tableCapacity = size; }
+	void InitializedDeck(unsigned int decksize){deck = new Deck(decksize);}
 
 	//clear all the players on table
 	void ClearTable();
@@ -36,8 +38,17 @@ public:
 
 	void GetLegalActions(unsigned int playerID, vector<Action>& acts);
 
-private:
-	Deck deck;
+	void DealPlayerCard(unsigned int seatPos);
+
+	void DealPlayerCards();
+
+
+//private:
+	vector<Player<GameEngine,Action>*> playerPtrs;
+	Deck* deck;
+
+
+
 	Table table;
 	TableState currentState;
 	
@@ -51,13 +62,16 @@ private:
 
 	//a vector storing all the players on table. the size of vector is always the size of the table; if a seat is empty,
 	//the pointer is NULL. e.g. A 4-player table, 2 players on seat, the vector may look like {player1 ,NULL, NULL, player2}
-	vector<Player<GameEngine,Action>*> playerPtrs;
+
 
 	//sbPos in the range of (0,tableCapacity), representing the next player to put small blind.
 	unsigned int sbPos;
 
-	//a vector(should be a list) storing the index of active players in playerPtrs.
-	vector<unsigned int> activeSeats;
+	//a vector, whose size is the size of table, storing whether a seat is occupied by an active player.
+	vector<bool> seatActive;
+
+	//for one game, activePlayersInPot is intialized to seatActive; as players fold cards, their pos will be set to be false
+	vector<bool> activePlayersInPot;
 
 	// num_st_table is the number of players doing straddle for the table. 1/2 level game, num_st_table == 0, 3/6/12, num_st_table == 1
 	// for each game, players can do straddle as they want. a 1/2, UTG play can do st, then num_st_game = 1

@@ -40,6 +40,7 @@ SRC_CPP = \
 	environments/Table.cpp \
 	environments/GameEngine.cpp \
 	environments/Card.cpp \
-	environments/Deck.cpp
+	environments/Deck.cpp \
+	environments/Action.cpp
 
 

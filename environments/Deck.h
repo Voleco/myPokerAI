@@ -27,11 +27,13 @@ public:
 	Deck(unsigned int size);
 	void ShuffleCards();
 	Card GetNthCard(unsigned int index);
+	Card DealOneCard();
 	unsigned int GetDeckSize() { return deckSize; }
 	friend std::ostream& operator <<(std::ostream& out, const Deck& d);
 private:
 	vector<Card> cards;
 	unsigned int deckSize;
+	unsigned int nextCardPos;
 };
 
 

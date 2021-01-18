@@ -26,6 +26,7 @@ public:
 	Action() {}
 	ActionType actionTpye;
 	int actionValue;
+	friend std::ostream& operator <<(std::ostream& out, const Action& a);
 };
 
 #endif // !ACTION_H

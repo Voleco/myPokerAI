@@ -26,6 +26,7 @@ public:
 	virtual void AddChips(int amount) { chipCount += amount; }
 	virtual void InformLegalActions(GameEngine& eng) ;
 	virtual void TakeAction(GameEngine& eng, Action a) ;
+	friend std::ostream& operator <<(std::ostream& out, const RandomPlayer& p);
 private:
 
 };
@@ -37,9 +38,19 @@ void RandomPlayer::InformLegalActions(GameEngine& eng)
 
 void RandomPlayer::TakeAction(GameEngine& eng, Action a)
 {
-	
+
 }
 
+std::ostream& operator <<(std::ostream& out,  const RandomPlayer& p)
+{
+	out << "playerID: "<<p.playerID <<", chipCount: "<<p.chipCount<<" private cards:";
+	for(unsigned int i=0;i<p.playerCards.size();i++)
+		out<<p.playerCards[i];
+	out<<" legal actions: ";
+	for(unsigned int i=0;i<p.acts.size();i++)
+		out<<p.acts[i];
+	return out;
+}
 
 
 #endif // !RANDOMPLAYER_H
