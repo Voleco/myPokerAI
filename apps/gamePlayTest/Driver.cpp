@@ -35,6 +35,7 @@ int main(int argc,char** argv)
 	eng.SetTableSize(8);
 	eng.ClearTable();
 
+	/*
 	RandomPlayer player1(101);
 	RandomPlayer player2(102);
 	RandomPlayer player3(103);
@@ -44,27 +45,33 @@ int main(int argc,char** argv)
 	player3.AddChips(900);
 	eng.AddPlayerToPos(&player1, 0);
 	eng.AddPlayerToPos(&player2, 2);
-	eng.AddPlayerToPos(&player3, 4);
-
+	eng.AddPlayerToPos(&player3, 4);	
+	*/
+	for (int i=0;i<8;i++)
+	{
+		RandomPlayer* p = new RandomPlayer((unsigned int)(100+i));
+		p->AddChips(900);
+		eng.AddPlayerToPos(p,i);
+	}
 
 	eng.SetBlindLevel(2, 4, 0, 1);
 	eng.SetNextSmallBlindPos(0);
 
-	cout<<"1\n";
+	//cout<<"1\n";
 
-	for (unsigned int i = 0; i < eng.tableCapacity; i++)
-	{
-		if(eng.seatActive[i])
-		//cout<<*((RandomPlayer*)(eng.playerPtrs[i]));
-		eng.playerPtrs[i]->PrintPlayerInfo();
-	}	
+	// for (unsigned int i = 0; i < eng.tableCapacity; i++)
+	// {
+	// 	if(eng.seatActive[i])
+	// 	//cout<<*((RandomPlayer*)(eng.playerPtrs[i]));
+	// 	eng.playerPtrs[i]->PrintPlayerInfo();
+	// }	
 
 	for(int i=0;i<1;i++)
 	{
 		eng.InitializeOneGame();
-		cout<<"2\n";
+		//cout<<"2\n";
 		eng.DealPlayerCards();
-		cout<<"3\n";
+		//cout<<"3\n";
 		for (unsigned int i = 0; i < eng.tableCapacity; i++)
 		{
 			if(eng.activePlayersInPot[i])
