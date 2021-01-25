@@ -39,7 +39,9 @@ void HandEvaluator::BuildDATFile()
 	int* cards_int = new int[5];
 	Card* cards = new Card[5];
 
-	
+vector<int> entryCounts;
+for (int i=0;i<10;i++)
+ { entryCounts.push_back(0);}
 
 	for(int x=0;x<TOTAL;x++)
 	{
@@ -121,88 +123,149 @@ void HandEvaluator::BuildDATFile()
 		}
 		else if (distinct_ranks.size()==3)//Two pairs, Three of a Kind
 		{
-			int a,b,c;
+			//for 3-of-a-kind, main part and 2 kickers; for 2 pairs, pair1, pair2 and kicker
+			int m, k1, k2;
 			if(ranks[0]!=ranks[1])
 			{
 				if (ranks[1]!=ranks[2])//abccc, Three of a Kind
 				{
-					a = ranks[0]-2;
-					b = ranks[1]-2;
-					c = ranks[4]-2;
+					m = ranks[4]-2;
+					k1 = ranks[1]-2;
+					k2 = ranks[0]-2;
 					handVal = handVal | 0x3000;
-					handVal += c*12*11/2 + a*11 + b-1;
 				}
 				else if(ranks[2]==ranks[3])//abbbc, Three of a Kind
 				{
-					a = ranks[0]-2;
-					b = ranks[1]-2;
-					c = ranks[4]-2;
+					m = ranks[1]-2;
+					k1 = ranks[4]-2;
+					k2 = ranks[0]-2;
 					handVal = handVal | 0x3000;
-					handVal += b*12*11/2 + a*11 + c-2;
 				}
 				else//abbcc,Two pairs
 				{
-					a = ranks[0]-2;
-					b = ranks[1]-2;
-					c = ranks[4]-2;
+					m = ranks[4]-2;
+					k1 = ranks[1]-2;
+					k2 = ranks[0]-2;
 					handVal = handVal | 0x2000;
-					handVal += c*12*11/2 + (b-1)*11 + a;
 				}
 			}
 			else if(ranks[1]!=ranks[2])
 			{
 				if(ranks[2]!=ranks[3])//aabcc,Two pairs
 				{
-					a = ranks[0]-2;
-					b = ranks[2]-2;
-					c = ranks[4]-2;
+					m = ranks[4]-2;
+					k1 = ranks[0]-2;
+					k2 = ranks[2]-2;
 					handVal = handVal | 0x2000;
-					handVal += c*12*11/2 + a*11 + b-1;
 				}
 				else//aabbc,Two pairs
 				{
-					a = ranks[0]-2;
-					b = ranks[2]-2;
-					c = ranks[4]-2;
+					m = ranks[2]-2;
+					k1 = ranks[0]-2;
+					k2 = ranks[4]-2;
 					handVal = handVal | 0x2000;
-					handVal += b*12*11/2 + a*11+c-2;
 				}
 			}
 			else //aaabc, Three of a Kind
 			{
-				a = ranks[0]-2;
-				b = ranks[3]-2;
-				c = ranks[4]-2;
+				m = ranks[0]-2;
+				k1 = ranks[4]-2;
+				k2 = ranks[3]-2;
 				handVal = handVal | 0x3000;
-				handVal += a*12*11/2 + (b-1)*11+(c-2);
+			}
+			if(handVal == 0x3000)
+			{
+				handVal += m * rc.NChooseK(12,2);
+				if (k1>m)
+					k1--;
+				if (k2>m)
+					k2--;
+				for (int j=1; j< k1;j++)
+					handVal += rc.NChooseK(j,1);
+				handVal += k2;
+			}
+			if(handVal == 0x2000)
+			{
+				//for a pair of m, there exist (m choose 2) 2-pair combinations that both 2 pairs smaller than m
+				//e.g. there are (12 choose 2) 2pairs smaller than AAxxx
+				//each 2pairs can result in 11 hands (11 different kickers)
+				handVal += rc.NChooseK(m,2)*11;
+				if (k2>m)
+					k2--;
+				if (k2>k1)
+					k2--;
+				handVal += k1*11;
+				handVal += k2;
 			}
 
 		}
 		else if (distinct_ranks.size()==4)//One pair
 		{
-			int nums[4];
+			//int nums[4];
 			int index = 0;
 			int offset = 0;
+
+			//main part(a pair) and 3 kickers
+			int m, k1,k2,k3;
 			for (int j=0;j<5;j++)
 			{
 				if (ranks[j]==ranks[j+1])
 				{
 					index = j;
-					offset = 1;
-					continue;
+					break;
 				}
-				nums[j-offset] = ranks[j] - 2;
+			}
+			switch (index)
+			{
+			case 0:
+				m = ranks[0]-2;
+				k1 = ranks[4]-2;
+				k2 = ranks[3]-2;
+				k3 = ranks[2]-2;
+				break;
+			case 1:
+				m = ranks[1]-2;
+				k1 = ranks[4]-2;
+				k2 = ranks[3]-2;
+				k3 = ranks[0]-2;
+				break;
+			case 2:
+				m = ranks[2]-2;
+				k1 = ranks[4]-2;
+				k2 = ranks[1]-2;
+				k3 = ranks[0]-2;
+				break;
+			case 3:
+				m = ranks[4]-2;
+				k1 = ranks[2]-2;
+				k2 = ranks[1]-2;
+				k3 = ranks[0]-2;
+				break;
+			default:
+				break;
 			}
 			handVal = handVal | 0x1000;
-			handVal += nums[index]*12*11*10/6;
-			int terms[3] = {55,10,1};
-			for (int j=0;j<4;j++)
-			{
-				if (j<index)
-					handVal += (nums[j]-j)*terms[j];
-				if(j>index)
-					handVal += (nums[j]-j)*terms[j-1];
-			}
+
+			//for a pair of m, there exist (m choose 1) one-pair combinations that the pair smaller than m
+			//e.g. there are (12 choose 1) onepair smaller than AAxxx
+			//each onepair can result in (12 choose 3) hands (3 different kickers)
+			handVal += m * rc.NChooseK(12,3);
+			if(k1>m)
+				k1--;
+			if(k2>m)
+				k2--;
+			if(k3>m)
+				k3--;
+				
+
+			//for (int j=3; j< k1;j++)
+			handVal += rc.NChooseK(k1,3);
+
+			//for (int j=2; j< k2;j++)
+			handVal += rc.NChooseK(k2,2);	
+			//for (int j=1; j< k3;j++)
+			handVal += rc.NChooseK(k3,1);
+
 
 		}
 		else if (distinct_ranks.size()==5)//High card, Flush, Straight, SF, RF
@@ -289,7 +352,9 @@ A High           12  choose 4      495
 */
 		handValueLookupTable[x] = handVal;
 	
-
+		uint16_t handType = handVal & 0xF000;
+		handType = handType>>12;
+		entryCounts[handType]++;
 	}
 
 
@@ -317,14 +382,19 @@ for (auto it=handValMap.begin();it!=handValMap.end();it++)
 {
 	uint16_t handType = it->first & 0xF000;
 	handType = handType>>12;
-	if(handType == 8)
-		cout<<"sf value: "<<std::hex<<it->first<<"\n";
+	//if(handType == 8)
+	//	cout<<"sf value: "<<std::hex<<it->first<<"\n";
 	counts[handType]++;
 
 }
 for (int i=0;i<10;i++)
 {
 	cout<<"type "<<i<<" : "<<counts[i]<<"\n";
+}
+
+for (int i=0;i<10;i++)
+{
+	cout<<"type "<<i<<" : entryCounts "<<entryCounts[i]<<"\n";
 }
 
 }
