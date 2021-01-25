@@ -126,3 +126,21 @@ std::ostream& operator <<(std::ostream& out, const Card& c)
 	out << c.cardStr;
 	return out;
 }
+
+int Card_to_int(Card c)
+{
+	int result = 0;
+	//std::cout<<"Card: "<<c<<"\n";
+	result = (c.r-2)*4;
+	//std::cout<<"result1"<<result<<"\n";
+	result += (4-c.s);
+	return result;
+}
+
+Card Int_to_card(int n)
+{
+	Rank r = static_cast<Rank>((n-1)/4 +2);
+	Suit s = static_cast<Suit>(3- (n-1)%4);
+	return Card(s,r);
+
+}
