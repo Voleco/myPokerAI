@@ -30,4 +30,5 @@ default : all
 
 SRC_CPP = \
 	utils/Timer.cpp \
+	utils/RankingCombinations.cpp
 
