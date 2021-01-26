@@ -14,7 +14,7 @@
 using std::cout;
 
 void gameFlowTest();
-void handEvaTest();
+void handEvaTest(const char* prefix, int testCnt);
 void rankingTest();
 
 int main(int argc,char** argv)
@@ -23,9 +23,9 @@ int main(int argc,char** argv)
 	{
 		rankingTest();
 	}
-	if (argc > 1 && strcmp(argv[1], "-testHand") == 0)
+	if (argc > 3 && strcmp(argv[1], "-testHand") == 0)
 	{
-		handEvaTest();
+		handEvaTest(argv[2],std::atoi(argv[3]));
 	}
 
 	else if (argc > 1 && strcmp(argv[1], "-run") == 0)
@@ -82,13 +82,52 @@ void rankingTest()
 		cout<<arr[i]<<",";
 	cout<<"\n"; //--- passed
 }
-void handEvaTest()
+void handEvaTest(const char* prefix, int testCnt)
 {
+	 HandEvaluator he(prefix);
+	 //he.BuildDATFile();
+	 Deck dk(52);
 
 
+//test code for evalute 5 cards
+	//  Card c1,c2,c3,c4,c5;
+	//  for (int i=0;i<testCnt;i++)
+	//  {
+	// 	 dk.ShuffleCards();
+	// 	 c1 = dk.DealOneCard();
+	// 	 c2 = dk.DealOneCard();
+	// 	 c3 = dk.DealOneCard();
+	// 	 c4 = dk.DealOneCard();
+	// 	 c5 = dk.DealOneCard();
 
-	 HandEvaluator he;
-	 he.BuildDATFile();
+	// 	cout<<"current hand: "<<c1<<c2<<c3<<c4<<c5<<"\n";
+	// 	uint16_t res = he.GetHandValue_5_Cards(c1,c2,c3,c4,c5);
+
+	// 	HandTypeEnum handtype = static_cast<HandTypeEnum>((res & 0xF000)>>12);
+	// 	cout<<"hand type: "<<handtype<<" ,hand value: " <<std::hex<<res<<std::oct<<"\n\n";
+	//  }
+
+//test code for evaluate 7 cards
+
+	 Card c1,c2,c3,c4,c5,c6,c7;
+	 for (int i=0;i<testCnt;i++)
+	 {
+		 dk.ShuffleCards();
+		 c1 = dk.DealOneCard();
+		 c2 = dk.DealOneCard();
+		 c3 = dk.DealOneCard();
+		 c4 = dk.DealOneCard();
+		 c5 = dk.DealOneCard();
+		 c6 = dk.DealOneCard();
+		 c7 = dk.DealOneCard();
+
+		cout<<"current cards: "<<c1 <<" "<<c2 <<" "<<c3 <<" "<<c4 <<" "<<c5 <<" "<<c6 <<" "<<c7<<"\n";
+		uint16_t res = he.GetHandValue_7_Cards(c1,c2,c3,c4,c5,c6,c7);
+
+		HandTypeEnum handtype = static_cast<HandTypeEnum>((res & 0xF000)>>12);
+		cout<<"hand type: "<<handtype<<" ,hand value: " <<std::hex<<res<<std::oct<<"\n\n";
+	 }
+	 
 }
 
 void gameFlowTest()
