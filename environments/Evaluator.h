@@ -13,6 +13,8 @@
 #include"Action.h"
 #include"../utils/RankingCombinations.h"
 
+//total number of entries in the lookup table (== 52 choose 5)
+#define TOTAL_NUM_ENTRIES_52C5 2598960
 
 using std::string;
 using std::vector;
@@ -20,7 +22,7 @@ using std::map;
 using std::cout;
 
 
-enum HandType {
+enum HandTypeEnum {
 	t_Royal_Flush         = 9,
 	t_Straight_Flush      = 8, 
 	t_Four_of_a_Kind      = 7, 
@@ -33,10 +35,26 @@ enum HandType {
 	t_High_Card           = 0 
 };
 
+std::ostream& operator <<(std::ostream& out, const HandTypeEnum& h);
+
 class HandEvaluator
 {
 public:
-	HandEvaluator() {}
+	HandEvaluator() 
+	{
+	}
+	HandEvaluator(const char* prefix) 
+	{
+		if(!LoadTableFromFile(prefix))
+		{
+			 BuildTable();
+			 SaveTableToFile(prefix);
+		}
+
+	}
+	~HandEvaluator() 
+	{
+	}
 
 	/*
 	build a DAT file of 2598960 entries so that:
@@ -44,20 +62,25 @@ public:
 	a combination of 5 cards
 	and the index of that entry is the rank of the 5 cards
 	*/
-	void BuildDATFile();
+	void BuildTable();
 	
 	/*
 	load the DAT file into memory for query
 	*/
-	bool LoadDATFlie();
+	bool LoadTableFromFile(const char *prefix);
+
+	bool SaveTableToFile(const char *prefix);
 
 	/*
 	query the handvalue of 5 cards
 	*/
-	uint64_t HandValue(Card c1, Card c2, Card c3, Card c4, Card c5);
+	uint16_t GetHandValue_5_Cards(Card c1, Card c2, Card c3, Card c4, Card c5);
+	uint16_t GetHandValue_6_Cards(Card c1, Card c2, Card c3, Card c4, Card c5, Card c6);
+	uint16_t GetHandValue_7_Cards(Card c1, Card c2, Card c3, Card c4, Card c5, Card c6, Card c7);
 
 private:
 
+	vector<uint16_t> handValueLookupTable;
 };
 
 
